@@ -54,7 +54,7 @@ def update_config():
 root = tk.Tk()
 root.title("Конфигурация")
 root.geometry("800x600")
-root.configure(bg="#2f2f2f")  # тёмный фон
+root.configure(bg="#2f2f2f")
 
 tk.Label(root, text="Токен бота", font=("Arial", 10), bg="#2f2f2f", fg="#ffffff").grid(row=0, column=0, padx=8, pady=8)
 tk.Label(root, text="Префикс команд", font=("Arial", 10), bg="#2f2f2f", fg="#ffffff").grid(row=1, column=0, padx=8, pady=8)
