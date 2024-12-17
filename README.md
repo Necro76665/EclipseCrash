@@ -35,3 +35,4 @@
 
 * ERROR: Could not find a version that satisfies the requirement tkinter (from versions: none)
 ERROR: No matching distribution found for tkinter (для старых версий питона)
+* все .exe имеют старую версию
